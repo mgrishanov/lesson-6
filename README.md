@@ -59,4 +59,18 @@ clickhouse-client --user default --password 12345
 
 ![8.png](src%2Fimg%2F8.png)
 
+#### Извлеките год и месяц из `transaction_date`.
+Для разнообразия перейдем в DataGrid
 
+```
+SELECT
+    formatDateTime(transaction_date, '%Y.%m') AS year_month,
+    user_id,
+    product_id,
+    quantity,
+    price
+FROM
+    transactions
+limit 5;
+```
+![9.png](src/img/9.png)
