@@ -74,3 +74,82 @@ FROM
 limit 5;
 ```
 ![9.png](src/img/9.png)
+
+#### Округлите `price` до ближайшего целого числа.
+
+```
+SELECT
+    formatDateTime(transaction_date, '%Y.%m') AS year_month,
+    user_id,
+    product_id,
+    quantity,
+    round(price) price
+FROM
+    transactions
+limit 5;
+```
+
+![10.png](src/img/10.png)
+
+#### Преобразуйте `transaction_id` в строку.
+
+```
+SELECT
+    formatDateTime(transaction_date, '%Y.%m') year_month,
+    toString(transaction_id) as transaction_id_to_string,
+    leftPad(toString(transaction_id), 5, '0') as transaction_id_format,
+    user_id,
+    product_id,
+    quantity,
+    round(price) price
+FROM
+    transactions
+limit 5;
+```
+
+#### Создайте простую UDF для расчета общей стоимости транзакции.
+
+Создание функции из SQL
+
+```
+CREATE FUNCTION total_cost AS (quantity, price) -> (quantity * price);
+```
+
+#### Используйте созданную UDF для расчета общей цены для каждой транзакции.
+
+Пример запроса с использованием функции ```total_cost```
+
+```
+SELECT
+    transaction_id,
+    quantity,
+    price,
+    round(total_cost(quantity, price), 2) AS final_cost
+FROM transactions;
+```
+
+![11.png](src/img/11.png)
+
+#### Создайте UDF для классификации транзакций на «высокоценные» и «малоценные» на основе порогового значения (например, 100).
+
+Создание функции из SQL 
+
+```
+CREATE FUNCTION transaction_category AS (amount, threshold) -> 
+    if(amount >= threshold, 'высокоценные', 'малоценные');
+```
+
+#### Примените UDF для категоризации каждой транзакции.
+
+Пример запроса с использованием функции ```transaction_category```
+
+```
+SELECT
+    transaction_id,
+    round(total_cost(quantity, price), 2) AS final_cost,
+    transaction_category(final_cost, 4000)
+FROM transactions
+limit 5;
+```
+
+![12.png](src/img/12.png)
